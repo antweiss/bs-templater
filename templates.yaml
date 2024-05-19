@@ -26,9 +26,10 @@ spec:
         repoUrl:
           title: Repository Location
           type: string
-           ui:field: RepoUrlPicker
-           ui:options:
-             allowedHosts:
+          description: Repo
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
                - github.com
   steps:
     - id: Log
