@@ -36,4 +36,41 @@ spec:
       name: Log
       action: debug:log
       input: 
-        message: "The name is ${{ parameters.name }}"  
+        message: "The name is ${{ parameters.name }}" 
+    - id: fetch-template
+      name: Fetch Template Repo
+      action: fetch:template
+      input:
+        url: ./express
+        #this defines that only .njk files will be templated
+        templateFileExtension: true
+        values:
+          name: ${{ parameters.name }}
+    - id: write-catalog-info
+      name: Write Catalog Info
+      action: catalog-write
+      input:
+          entity:
+            apiVersion: backstage.io/v1alpha1
+            kind: Component
+            metadata:
+              name: ${{ parameters.name }}
+              namespace: default
+              description: The ${{ parameters.name }} service
+            spec:
+              type: app
+              lifecycle: production
+              owner: group:stagecentral
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: This is ${{ parameters.name }}
+        repoUrl: ${{ parameters.repoUrl }}
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
